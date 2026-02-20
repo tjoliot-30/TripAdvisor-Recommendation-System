@@ -1,0 +1,63 @@
+Information Retrieval Project 1 - Step-by-Step Thinking & Report
+===================================================================
+
+Dear Professor / Reviewer,
+
+Below is the detailed step-by-step thinking throughout this Information Retrieval project. I've focused on ensuring a robust methodology while balancing theoretical concepts with practical constraints, as outlined in your expectations.
+
+--- STEP 1: Understanding the Objective & Hypothesis ---
+The goal is to build a Recommendation System that recommends the most similar place based solely on textual reviews. 
+Hypothesis: Similar experiences (e.g., similar cuisines, similar attraction sub-types) are expressed using similar vocabulary in user reviews. If we can capture this textual footprint, we can recommend places without relying on metadata.
+
+--- STEP 2: Data Exploration & Preprocessing Strategy ---
+1. Data Scale & Constraints: 
+   The provided dataset `reviews83325.csv` is huge (over 200MB) with an unbalanced number of reviews per place. If we use all reviews, places with thousands of reviews will dominate the vector space, creating a massive discrepancy.
+2. English Filtering: 
+   I filtered reviews by `langue == 'en'` to ensure the text representations share the same vocabulary space. Mixing languages would mean a French review for an art museum and an English review for an art museum wouldn't share keywords, undermining our hypothesis.
+3. Balancing the Corpus:
+   To solve the discrepancy, I limited the aggregation to the top 20 English reviews per place. This bounded our sequence lengths and normalized the amount of information describing each place. Then, I concatenated these reviews into a single text document representing the "Place Profile."
+
+--- STEP 3: Evaluation Protocol Design ---
+The assignment asks for Ranking Error Level 1 and Level 2 on a 50/50 train/test split.
+- Train (50%): Acts as the "Queries" set. 
+- Test (50%): Acts as the "Database" or Search Space.
+- Ranking Error: We compute the index (0-based) of the first retrieved place in the Test set that matches the Query's metadata categories. Lower score is better.
+- Level 1: Measures broad similarity. It simply checks if the retrieved place shares the same broad `typeR` (Hotel, Restaurant, Attraction).
+- Level 2: Measures fine-grained similarity. For Restaurants, it checks for overlap in `restaurantType` or `cuisine`. For Attractions, `activiteSubCategorie` or `activiteSubType`. For Hotels, `priceRange`.
+
+--- STEP 4: Baseline Implementation (BM25) ---
+I used the `rank-bm25` module as the baseline model. 
+- Concept: BM25 improves upon standard TF-IDF by applying a probabilistic foundation and length normalization. It scores a query against a document using term frequencies but dampens the effect of extreme term repetitions and normalizes by average document length.
+- Limitation for our use case: BM25 is explicitly designed for short queries searching through longer documents (e.g., a Google Search). In our system, the "query" is actually the concatenated reviews of a place (a very long query). This can lead to unexpected behaviors where rare words in the long query artificially inflate scores.
+- BM25 Metrics on 50% test set:
+  * Level 1 Error: 0.58
+  * Level 2 Error: 5.94
+
+--- STEP 5: Designing a Better Model (Why TF-IDF + Cosine Similarity?) ---
+For the upgraded model, I chose a TF-IDF Vectorizer combined with Cosine Similarity, restricting the vocabulary to the top 3,000 contextual words and filtering English stop-words. 
+- Trade-off Analysis: 
+  I considered Word Embeddings (Word2Vec / Doc2Vec) or Sentence Transformers. While these deep-learning models capture semantic synonyms (e.g., "fast" = "quick"), they are computationally expensive and might overfit on general language rather than specific review terminologies. SVD (Latent Semantic Analysis) could also work, but with text documents of varying length that are simply bag-of-words concatenations, TF-IDF + Cosine Similarity is highly practical and often conceptually stronger than BM25 for document-to-document similarity.
+- Why Cosine Similarity? 
+  Unlike BM25 which is asymmetric (Query vs Document), Cosine Similarity computes the cosine of the angle between two L2-normalized TF-IDF vectors. Because both our "Query" and our "Database items" are long concatenated reviews, taking the dot product of two L2-normalized vectors provides much fairer comparison metric for matching full topic profiles. We also removed common English stop-words to eliminate noise (like "the", "and", "but") which don't contribute to similarity.
+- Results (TF-IDF + Cosine):
+  * Level 1 Error: 0.67
+  * Level 2 Error: 4.66
+
+--- STEP 6: Reflection, Error Analysis, & Insights ---
+What worked: 
+Our TF-IDF model substantially improved the Level 2 Ranking Error from 5.94 to 4.66 (over 1 position better on average compared to BM25!). This validates the hypothesis that using Cosine Similarity on cleaned TF-IDF representations captures deep conceptual similarities (like cuisines or attraction themes) much better than the asymmetric BM25 search function.
+
+What didn't work / Limitations:
+Interestingly, Level 1 error slightly deteriorated with TF-IDF (0.67 vs 0.58).
+Why? Because BM25 might be very good at matching broad, highly frequent words identifying general categories (the word "Hotel" repeated 50 times in a document is scored very high by BM25), giving it an edge in broad, easy classification (Level 1). However, TF-IDF + Cosine Similarity excels at the subtleties (the "long tail" of vocabulary), hence it dominated the Level 2 fine-grained matching (finding specific art types or cuisines).
+
+The Role of Errors as Teachers:
+The primary error in this system comes from the subjective nature of reviews. One reviewer might talk extensively about a restaurant's "decor" and "view", while another restaurant of the exact same cuisine has reviews focusing entirely on the "spicy chicken" or "waiter service". Since our model doesn't use metadata, it's blind to the true label and completely at the mercy of humans' descriptive bias. Consequently, a Thai restaurant with great views might be falsely matched with an Italian restaurant with great views, leading to a Ranking Error. 
+
+Going Beyond - The Future of the System:
+To improve on this, I would incorporate Latent Dirichlet Allocation (LDA) for Topic Modeling as a future step. By extracting "Topics" like [Atmosphere, Food Quality, Price, Location], we could measure similarity per-topic, ensuring that we only match places based on their "Item Description" topic rather than matching them based on the reviewers complaining about "waiting 30 minutes in line."
+
+Conclusion:
+This activity successfully proved the hypothesis. A system relying purely on textual reviews via TF-IDF Vectorization and Cosine Similarity can successfully match high-level meta-data profiles (Level 2 categories) across thousands of locations.
+
+Timothée Joliot & Ovia Chanemouganandam

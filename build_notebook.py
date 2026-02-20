@@ -1,8 +1,9 @@
-{
+import json
+
+notebook = {
  "cells": [
   {
    "cell_type": "markdown",
-   "id": "0516eac1",
    "metadata": {},
    "source": [
     "# Information Retrieval Project 1\n",
@@ -14,44 +15,9 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 1,
-   "id": "4627f5c8",
+   "execution_count": None,
    "metadata": {},
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "Defaulting to user installation because normal site-packages is not writeable\n",
-      "Requirement already satisfied: rank-bm25 in c:\\users\\tjoli\\appdata\\roaming\\python\\python39\\site-packages (0.2.2)\n",
-      "Requirement already satisfied: pandas in c:\\users\\tjoli\\appdata\\roaming\\python\\python39\\site-packages (2.3.3)\n",
-      "Requirement already satisfied: numpy in c:\\users\\tjoli\\appdata\\roaming\\python\\python39\\site-packages (2.0.2)\n",
-      "Requirement already satisfied: scikit-learn in c:\\users\\tjoli\\appdata\\roaming\\python\\python39\\site-packages (1.6.1)\n",
-      "Requirement already satisfied: python-dateutil>=2.8.2 in c:\\users\\tjoli\\appdata\\roaming\\python\\python39\\site-packages (from pandas) (2.9.0.post0)\n",
-      "Requirement already satisfied: tzdata>=2022.7 in c:\\users\\tjoli\\appdata\\roaming\\python\\python39\\site-packages (from pandas) (2025.2)\n",
-      "Requirement already satisfied: pytz>=2020.1 in c:\\users\\tjoli\\appdata\\roaming\\python\\python39\\site-packages (from pandas) (2025.2)\n",
-      "Requirement already satisfied: scipy>=1.6.0 in c:\\users\\tjoli\\appdata\\roaming\\python\\python39\\site-packages (from scikit-learn) (1.13.1)\n",
-      "Requirement already satisfied: threadpoolctl>=3.1.0 in c:\\users\\tjoli\\appdata\\roaming\\python\\python39\\site-packages (from scikit-learn) (3.6.0)\n",
-      "Requirement already satisfied: joblib>=1.2.0 in c:\\users\\tjoli\\appdata\\roaming\\python\\python39\\site-packages (from scikit-learn) (1.5.2)\n",
-      "Requirement already satisfied: six>=1.5 in c:\\users\\tjoli\\appdata\\roaming\\python\\python39\\site-packages (from python-dateutil>=2.8.2->pandas) (1.17.0)\n",
-      "Note: you may need to restart the kernel to use updated packages.\n"
-     ]
-    },
-    {
-     "name": "stderr",
-     "output_type": "stream",
-     "text": [
-      "WARNING: Ignoring invalid distribution -rotobuf (c:\\users\\tjoli\\appdata\\roaming\\python\\python39\\site-packages)\n",
-      "WARNING: Ignoring invalid distribution -rotobuf (c:\\users\\tjoli\\appdata\\roaming\\python\\python39\\site-packages)\n",
-      "WARNING: Ignoring invalid distribution -rotobuf (c:\\users\\tjoli\\appdata\\roaming\\python\\python39\\site-packages)\n",
-      "WARNING: Ignoring invalid distribution -rotobuf (c:\\users\\tjoli\\appdata\\roaming\\python\\python39\\site-packages)\n",
-      "WARNING: Ignoring invalid distribution -rotobuf (c:\\users\\tjoli\\appdata\\roaming\\python\\python39\\site-packages)\n",
-      "WARNING: Ignoring invalid distribution -rotobuf (c:\\users\\tjoli\\appdata\\roaming\\python\\python39\\site-packages)\n",
-      "WARNING: You are using pip version 22.0.4; however, version 26.0.1 is available.\n",
-      "You should consider upgrading via the 'c:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\Python39_64\\python.exe -m pip install --upgrade pip' command.\n"
-     ]
-    }
-   ],
+   "outputs": [],
    "source": [
     "%pip install rank-bm25 pandas numpy scikit-learn\n",
     "import pandas as pd\n",
@@ -66,7 +32,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "5ef3ebea",
    "metadata": {},
    "source": [
     "## 1. Data Preprocessing & Discrepancy Reduction\n",
@@ -78,8 +43,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 2,
-   "id": "1027a934",
+   "execution_count": None,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -109,7 +73,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "35b3aff5",
    "metadata": {},
    "source": [
     "## 2. Evaluation Logic\n",
@@ -120,8 +83,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 3,
-   "id": "7bbb671a",
+   "execution_count": None,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -175,7 +137,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "9445b0eb",
    "metadata": {},
    "source": [
     "## 3. The BM25 Baseline\n",
@@ -185,23 +146,9 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 4,
-   "id": "79c26b20",
+   "execution_count": None,
    "metadata": {},
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "Loading reviews dataset...\n",
-      "Loading places dataset...\n",
-      "Final Dataset Length: 1835 places with English reviews.\n",
-      "Tokenizing test corpus for BM25...\n",
-      "Evaluating BM25...\n",
-      "BM25 -> Level 1 Error: 0.579 | Level 2 Error: 5.937\n"
-     ]
-    }
-   ],
+   "outputs": [],
    "source": [
     "df = load_and_preprocess_data()\n",
     "# 50% split for Queries(Train) vs Ranked Results(Test)\n",
@@ -230,7 +177,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "decc0b00",
    "metadata": {},
    "source": [
     "## 4. Our Better Model: TF-IDF + Cosine Similarity\n",
@@ -244,20 +190,9 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 5,
-   "id": "990e11e2",
+   "execution_count": None,
    "metadata": {},
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "Building TF-IDF Vector Space...\n",
-      "Evaluating TF-IDF Cosine Similarity...\n",
-      "TF-IDF -> Level 1 Error: 0.672 | Level 2 Error: 4.657\n"
-     ]
-    }
-   ],
+   "outputs": [],
    "source": [
     "print(\"Building TF-IDF Vector Space...\")\n",
     "vectorizer = TfidfVectorizer(max_features=3000, stop_words='english')\n",
@@ -279,7 +214,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "31760a84",
    "metadata": {},
    "source": [
     "## 5. Reflection & Conclusions\n",
@@ -317,3 +251,6 @@
  "nbformat": 4,
  "nbformat_minor": 5
 }
+
+with open('Notebook.ipynb', 'w', encoding='utf-8') as f:
+    json.dump(notebook, f, indent=1)
